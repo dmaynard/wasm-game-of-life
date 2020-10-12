@@ -34,9 +34,11 @@ pub struct Universe {
     cells: Vec<Cell>,
 }
 /// Public methods, exported to JavaScript.
+extern crate js_sys;
+extern crate web_sys;
 #[wasm_bindgen]
 impl Universe {
-    fn get_index(&self, row: u32, column: u32) -> usize {
+    pub fn get_index(&self, row: u32, column: u32) -> usize {
         (row * self.width + column) as usize
     }
 
@@ -110,6 +112,32 @@ impl fmt::Display for Universe {
         Ok(())
     }
 }
+
+#[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+
+    // The `console.log` is quite polymorphic, so we can bind it with multiple
+    // signatures. Note that we need to use `js_name` to ensure we always call
+    // `log` in JS.
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u32(a: u32);
+
+    // Multiple arguments too!
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_many(a: &str, b: &str);
+}
+
+fn using_web_sys() {
+       
+    
+    log ("hello from Rust");
+
+    
+}
 #[wasm_bindgen]
 impl Universe {
     // ...
@@ -119,24 +147,42 @@ impl Universe {
         let height = 64;
 
         let cells = (0..width * height)
-            .map(|i| {
-                if i % 2 == 0 || i % 7 == 0 {
+            .map(|_i| {
+                if js_sys::Math::random() < 0.5 {
                     Cell::Alive
                 } else {
                     Cell::Dead
                 }
             })
             .collect();
+        log(" hello");
 
         Universe {
             width,
             height,
             cells,
         }
+       
     }
-
+    
     pub fn render(&self) -> String {
         self.to_string()
+    }
+    fn get_index2 ( x: u32 , y: u32, w: u32, h: u32) -> usize {
+        ((y * w + x) + (h/2 * w) + (w/2)) as usize
+        
+    }
+   
+  
+
+    pub fn make_spaceship(&mut self) -> () {
+        let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
+        for i in 0..self.cells.len()  {
+            self.cells[i] = Cell::Dead;
+        }
+        for pts in targets.iter() {
+            self.cells[ Universe::get_index2(pts.0,pts.1, self.width, self.height) ] = Cell::Alive;
+        }   
     }
 }
 
