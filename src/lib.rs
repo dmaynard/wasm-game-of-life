@@ -35,7 +35,7 @@ pub struct Universe {
 }
 /// Public methods, exported to JavaScript.
 extern crate js_sys;
-extern crate web_sys;
+// extern crate web_sys;
 #[wasm_bindgen]
 impl Universe {
     pub fn get_index(&self, row: u32, column: u32) -> usize {
@@ -130,14 +130,17 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn log_many(a: &str, b: &str);
 }
+// Next let's define a macro that's like `println!`, only it works for
+// `console.log`. Note that `println!` doesn't actually work on the wasm target
+// because the standard library currently just eats all output. To get
+// `println!`-like behavior in your app you'll likely want a macro like this.
 
-fn using_web_sys() {
-       
-    
-    log ("hello from Rust");
-
-    
+macro_rules! console_log {
+    // Note that this is using the `log` function imported above during
+    // `bare_bones`
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
+
 #[wasm_bindgen]
 impl Universe {
     // ...
@@ -155,7 +158,7 @@ impl Universe {
                 }
             })
             .collect();
-        log(" hello");
+        console_log!("Creating a {} x {} Life Universe", width, height);
 
         Universe {
             width,
