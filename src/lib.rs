@@ -14,6 +14,34 @@ extern {
 }
 
 #[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+
+    // The `console.log` is quite polymorphic, so we can bind it with multiple
+    // signatures. Note that we need to use `js_name` to ensure we always call
+    // `log` in JS.
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u32(a: u32);
+
+    // Multiple arguments too!
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_many(a: &str, b: &str);
+}
+// Next let's define a macro that's like `println!`, only it works for
+// `console.log`. Note that `println!` doesn't actually work on the wasm target
+// because the standard library currently just eats all output. To get
+// `println!`-like behavior in your app you'll likely want a macro like this.
+
+macro_rules! console_log {
+    // Note that this is using the `log` function imported above during
+    // `bare_bones`
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
+#[wasm_bindgen]
 pub fn greet(name: &str) {
     alert("Hello, wasm-game-of-life!");
     alert(&format!("Hello, {}!", name));
@@ -113,45 +141,18 @@ impl fmt::Display for Universe {
     }
 }
 
-#[wasm_bindgen]
-extern "C" {
-    // Use `js_namespace` here to bind `console.log(..)` instead of just
-    // `log(..)`
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-
-    // The `console.log` is quite polymorphic, so we can bind it with multiple
-    // signatures. Note that we need to use `js_name` to ensure we always call
-    // `log` in JS.
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-
-    // Multiple arguments too!
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_many(a: &str, b: &str);
-}
-// Next let's define a macro that's like `println!`, only it works for
-// `console.log`. Note that `println!` doesn't actually work on the wasm target
-// because the standard library currently just eats all output. To get
-// `println!`-like behavior in your app you'll likely want a macro like this.
-
-macro_rules! console_log {
-    // Note that this is using the `log` function imported above during
-    // `bare_bones`
-    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
-}
 
 #[wasm_bindgen]
 impl Universe {
     // ...
 
     pub fn new() -> Universe {
-        let width = 64;
-        let height = 64;
+        let width = 32;
+        let height = 32;
 
         let cells = (0..width * height)
             .map(|_i| {
-                if js_sys::Math::random() < 0.5 {
+                if js_sys::Math::random() < 0.2 {
                     Cell::Alive
                 } else {
                     Cell::Dead
@@ -171,12 +172,11 @@ impl Universe {
     pub fn render(&self) -> String {
         self.to_string()
     }
+
     fn get_index2 ( x: u32 , y: u32, w: u32, h: u32) -> usize {
         ((y * w + x) + (h/2 * w) + (w/2)) as usize
         
     }
-   
-  
 
     pub fn make_spaceship(&mut self) -> () {
         let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
@@ -185,7 +185,6 @@ impl Universe {
         }
         for pts in targets.iter() {
             self.cells[ Universe::get_index2(pts.0,pts.1, self.width, self.height) ] = Cell::Alive;
-        }   
+        }
     }
 }
-
