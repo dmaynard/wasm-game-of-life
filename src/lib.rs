@@ -61,9 +61,36 @@ pub struct Universe {
     height: u32,
     cells: Vec<Cell>,
 }
+#[wasm_bindgen]
+pub struct Point {
+    x: u32,
+    y: u32,
+}
+
 /// Public methods, exported to JavaScript.
 extern crate js_sys;
 // extern crate web_sys;
+// const SPACESHIP: [Point; 9] = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
+const SPACESHIP: [Point; 9] = 
+    [
+       Point {x: 0, y: 0},
+       Point  {x: 1, y: 0}, 
+       Point {x: 2, y: 0},
+       Point  {x: 3, y: 0}, 
+       Point {x: 0, y: 1},
+       Point  {x: 4, y: 1}, 
+       Point {x: 0, y: 2},
+       Point  {x: 1, y: 3}, 
+       Point {x: 4, y: 3}
+    ];
+       
+       
+       // const RPENTOMINO: [Point; 5] = [{x: 0, y: 0}, (0,1), (1,1), (2,1), (1,2)];
+const RPENTOMINO: [Point; 5] = [Point {x: 0, y: 0},
+       Point  {x: 0, y: 1}, 
+       Point {x: 1, y: 1},
+       Point  {x: 2, y: 1}, 
+       Point {x: 1, y: 2}];
 #[wasm_bindgen]
 impl Universe {
     pub fn get_index(&self, row: u32, column: u32) -> usize {
@@ -77,7 +104,6 @@ impl Universe {
                 if delta_row == 0 && delta_col == 0 {
                     continue;
                 }
-
                 let neighbor_row = (row + delta_row) % self.height;
                 let neighbor_col = (column + delta_col) % self.width;
                 let idx = self.get_index(neighbor_row, neighbor_col);
@@ -141,7 +167,6 @@ impl fmt::Display for Universe {
     }
 }
 
-
 #[wasm_bindgen]
 impl Universe {
     // ...
@@ -165,8 +190,7 @@ impl Universe {
             width,
             height,
             cells,
-        }
-       
+        }     
     }
     
     pub fn render(&self) -> String {
@@ -185,14 +209,23 @@ impl Universe {
     }
 
     pub fn make_spaceship(&mut self) -> () {
-        let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
+        // let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
         self.clear_grid();
-        for pts in targets.iter() {
-            self.cells[ Universe::centered_index(pts.0,pts.1, self.width, self.height) ] = Cell::Alive;
-        }
+        make_shape(self, &SPACESHIP);
+    }
+    pub fn make_rpentamino(&mut self) -> () {
+        // let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
+        self.clear_grid();
+        make_shape(self, &RPENTOMINO);
     }
 }
 /// Public methods, exported to JavaScript.
+fn make_shape( niverse: &mut Universe, shapes: &[Point]) -> () {
+        niverse.clear_grid();
+        for pts in shapes.iter() {
+            niverse.cells[ Universe::centered_index(pts.x,pts.y, niverse.width, niverse.height) ] = Cell::Alive;
+        }
+    }
 #[wasm_bindgen]
 impl Universe {
     // ...
