@@ -147,8 +147,8 @@ impl Universe {
     // ...
 
     pub fn new() -> Universe {
-        let width = 32;
-        let height = 32;
+        let width = 64;
+        let height = 64;
 
         let cells = (0..width * height)
             .map(|_i| {
@@ -173,18 +173,22 @@ impl Universe {
         self.to_string()
     }
 
-    fn get_index2 ( x: u32 , y: u32, w: u32, h: u32) -> usize {
+    fn centered_index ( x: u32 , y: u32, w: u32, h: u32) -> usize {
         ((y * w + x) + (h/2 * w) + (w/2)) as usize
         
     }
 
-    pub fn make_spaceship(&mut self) -> () {
-        let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
+    fn clear_grid( &mut self) -> () {
         for i in 0..self.cells.len()  {
             self.cells[i] = Cell::Dead;
         }
+    }
+
+    pub fn make_spaceship(&mut self) -> () {
+        let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
+        self.clear_grid();
         for pts in targets.iter() {
-            self.cells[ Universe::get_index2(pts.0,pts.1, self.width, self.height) ] = Cell::Alive;
+            self.cells[ Universe::centered_index(pts.0,pts.1, self.width, self.height) ] = Cell::Alive;
         }
     }
 }
