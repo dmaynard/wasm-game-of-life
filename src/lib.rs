@@ -70,27 +70,14 @@ pub struct Point {
 /// Public methods, exported to JavaScript.
 extern crate js_sys;
 // extern crate web_sys;
-// const SPACESHIP: [Point; 9] = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
-const SPACESHIP: [Point; 9] = 
-    [
-       Point {x: 0, y: 0},
-       Point  {x: 1, y: 0}, 
-       Point {x: 2, y: 0},
-       Point  {x: 3, y: 0}, 
-       Point {x: 0, y: 1},
-       Point  {x: 4, y: 1}, 
-       Point {x: 0, y: 2},
-       Point  {x: 1, y: 3}, 
-       Point {x: 4, y: 3}
-    ];
-       
-       
-       // const RPENTOMINO: [Point; 5] = [{x: 0, y: 0}, (0,1), (1,1), (2,1), (1,2)];
-const RPENTOMINO: [Point; 5] = [Point {x: 0, y: 0},
-       Point  {x: 0, y: 1}, 
-       Point {x: 1, y: 1},
-       Point  {x: 2, y: 1}, 
-       Point {x: 1, y: 2}];
+const SPACESHIP:  [(u32,u32);9] = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
+
+const RPENTOMINO: [(u32,u32); 5] = [ (0,0), (0,1), (1,1), (2,1), (1,2)];
+    
+
+const PIHEPTOMINO: [(u32,u32); 7] = [ (0,0), (1,0), (2,0), (0,1), (2,1), (0,2), (2,2)];
+
+const GLIDER: [(u32,u32);5] =  [(1,2), (2,3), (3,1), (3,2), (3,3)];
 #[wasm_bindgen]
 impl Universe {
     pub fn get_index(&self, row: u32, column: u32) -> usize {
@@ -211,21 +198,26 @@ impl Universe {
     pub fn make_spaceship(&mut self) -> () {
         // let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
         self.clear_grid();
-        make_shape(self, &SPACESHIP);
+        Universe::set_cells(self, &SPACESHIP);
     }
     pub fn make_rpentamino(&mut self) -> () {
         // let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
+        // self.clear_grid();
+        Universe::set_cells(self, &RPENTOMINO);
+    }
+    pub fn make_piheptomino(&mut self) -> () {
+        // let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
         self.clear_grid();
-        make_shape(self, &RPENTOMINO);
+        Universe::set_cells(self, &PIHEPTOMINO);
     }
+
+    pub fn make_glider(&mut self) -> () {
+        self.clear_grid();
+        Universe::set_cells(self, &GLIDER);
+    }
+    
 }
-/// Public methods, exported to JavaScript.
-fn make_shape( niverse: &mut Universe, shapes: &[Point]) -> () {
-        niverse.clear_grid();
-        for pts in shapes.iter() {
-            niverse.cells[ Universe::centered_index(pts.x,pts.y, niverse.width, niverse.height) ] = Cell::Alive;
-        }
-    }
+
 #[wasm_bindgen]
 impl Universe {
     // ...
@@ -239,6 +231,47 @@ impl Universe {
     }
 
     pub fn cells(&self) -> *const Cell {
+        console_log!("Reference tp {} x {} Life Universe ", self.width, self.height);
         self.cells.as_ptr()
     }
+     // ...
+
+    /// Set the width of the universe.
+    ///
+    /// Resets all cells to the dead state.
+    pub fn set_width(&mut self, width: u32) {
+        console_log!(" Set Width {}", width);
+        self.width = width;
+        self.cells = (0..width * self.height).map(|_i| Cell::Dead).collect();
+    }
+
+    /// Set the height of the universe.
+    ///
+    /// Resets all cells to the dead state.
+    pub fn set_height(&mut self, height: u32) {
+        console_log!(" Set Height {}", height);
+        self.height = height;
+        self.cells = (0..self.width * height).map(|_i| Cell::Dead).collect();
+    }
+}
+impl Universe {
+    /// Get the dead and alive values of the entire universe.
+    pub fn get_cells(&self) -> &[Cell] {
+        let raw_ptr = &self.cells;
+        console_log! ("get_cells {:p}", raw_ptr) ;
+        &self.cells
+
+    }
+
+    /// Set cells to be alive in a universe by passing the row and column
+    /// of each cell as an array.
+    pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
+        self.clear_grid();
+        let middle = (self.width * (self.height/2) + self.width/2) as usize;
+        for (col, row) in cells.iter().cloned() {
+            let idx = self.get_index(row, col);
+            self.cells[idx+middle] = Cell::Alive;
+        }
+    }
+
 }
