@@ -61,22 +61,14 @@ pub struct Universe {
     height: u32,
     cells: Vec<Cell>,
 }
-#[wasm_bindgen]
-pub struct Point {
-    x: u32,
-    y: u32,
-}
+
 
 /// Public methods, exported to JavaScript.
 extern crate js_sys;
 // extern crate web_sys;
 const SPACESHIP:  [(u32,u32);9] = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
-
 const RPENTOMINO: [(u32,u32); 5] = [ (0,0), (0,1), (1,1), (2,1), (1,2)];
-    
-
 const PIHEPTOMINO: [(u32,u32); 7] = [ (0,0), (1,0), (2,0), (0,1), (2,1), (0,2), (2,2)];
-
 const GLIDER: [(u32,u32);5] =  [(1,2), (2,3), (3,1), (3,2), (3,3)];
 #[wasm_bindgen]
 impl Universe {
@@ -158,9 +150,9 @@ impl fmt::Display for Universe {
 impl Universe {
     // ...
 
-    pub fn new() -> Universe {
-        let width = 64;
-        let height = 64;
+    pub fn new(w: u32, h: u32) -> Universe {
+        let width = w;
+        let height = h;
 
         let cells = (0..width * height)
             .map(|_i| {
@@ -182,11 +174,6 @@ impl Universe {
     
     pub fn render(&self) -> String {
         self.to_string()
-    }
-
-    fn centered_index ( x: u32 , y: u32, w: u32, h: u32) -> usize {
-        ((y * w + x) + (h/2 * w) + (w/2)) as usize
-        
     }
 
     fn clear_grid( &mut self) -> () {
@@ -231,7 +218,7 @@ impl Universe {
     }
 
     pub fn cells(&self) -> *const Cell {
-        console_log!("Reference tp {} x {} Life Universe ", self.width, self.height);
+        console_log!("Reference to {} x {} Life Universe ", self.width, self.height);
         self.cells.as_ptr()
     }
      // ...
@@ -250,6 +237,15 @@ impl Universe {
     /// Resets all cells to the dead state.
     pub fn set_height(&mut self, height: u32) {
         console_log!(" Set Height {}", height);
+        self.height = height;
+        self.cells = (0..self.width * height).map(|_i| Cell::Dead).collect();
+    }
+    /// Set the dimensions of the universe.
+    ///
+    /// Resets all cells to the dead state.
+    pub fn set_dimensions(&mut self, width: u32, height: u32) {
+        console_log!(" Set Width {} and Height {}", width, height);
+        self.width = width;
         self.height = height;
         self.cells = (0..self.width * height).map(|_i| Cell::Dead).collect();
     }
