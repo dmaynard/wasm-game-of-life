@@ -104,6 +104,7 @@ impl Universe {
 #[wasm_bindgen]
 impl Universe {
     pub fn tick(&mut self) {
+        // let _timer = Timer::new("Universe::tick");
         let mut next = self.cells.clone();
 
         for row in 0..self.height {
@@ -226,7 +227,7 @@ impl Universe {
     }
 
     pub fn cells(&self) -> *const Cell {
-        console_log!("Reference to {} x {} Life Universe ", self.width, self.height);
+        // console_log!("Reference to {} x {} Life Universe ", self.width, self.height);
         self.cells.as_ptr()
     }
      // ...
@@ -267,7 +268,7 @@ impl Universe {
     /// Get the dead and alive values of the entire universe.
     pub fn get_cells(&self) -> &[Cell] {
         let raw_ptr = &self.cells;
-        console_log! ("get_cells {:p}", raw_ptr) ;
+        // console_log! ("get_cells {:p}", raw_ptr) ;
         &self.cells
 
     }
@@ -283,4 +284,24 @@ impl Universe {
         }
     }
 
+}
+
+extern crate web_sys;
+use web_sys::console;
+
+pub struct Timer<'a> {
+    name: &'a str,
+}
+
+impl<'a> Timer<'a> {
+    pub fn new(name: &'a str) -> Timer<'a> {
+        console::time_with_label(name);
+        Timer { name }
+    }
+}
+
+impl<'a> Drop for Timer<'a> {
+    fn drop(&mut self) {
+        console::time_end_with_label(self.name);
+    }
 }
