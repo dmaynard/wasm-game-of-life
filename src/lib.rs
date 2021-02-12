@@ -267,10 +267,7 @@ impl Universe {
 impl Universe {
     /// Get the dead and alive values of the entire universe.
     pub fn get_cells(&self) -> &[Cell] {
-        let raw_ptr = &self.cells;
-        // console_log! ("get_cells {:p}", raw_ptr) ;
         &self.cells
-
     }
 
     /// Set cells to be alive in a universe by passing the row and column
