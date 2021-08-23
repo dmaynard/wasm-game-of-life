@@ -3,6 +3,8 @@ name = "wasm-game-of-life"
 version = "0.1.0"
 authors = ["dmaynard <davidsmaynard@gmail.com>"]
 edition = "2018"
+description = "wasmm game of life tutorial" 
+repository ="git@github.com:dmaynard/wasm-game-of-life.git"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
