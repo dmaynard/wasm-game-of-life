@@ -44,7 +44,7 @@ cd my-project
 ### 🛠️ Build with `wasm-pack build`
 
 ```
-wasm-pack build
+wasm-pack build --scope davidsmaynard
 ```
 
 ### 🔬 Test in Headless Browsers with `wasm-pack test`
@@ -53,10 +53,10 @@ wasm-pack build
 wasm-pack test --headless --firefox
 ```
 
-### 🎁 Publish to NPM with `wasm-pack publish`
+### 🎁 Publish to NPM with `wasm-pack publish --access=public`
 
 ```
-wasm-pack publish
+wasm-pack publish --access=public
 ```
 
 ## 🔋 Batteries Included
