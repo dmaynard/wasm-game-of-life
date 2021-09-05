@@ -148,7 +148,7 @@ impl fmt::Display for Universe {
                 let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
                 write!(f, "{}", symbol)?;
             }
-            write!(f, "\n")?;
+            writeln!(f, "\n")?;
         }
 
         Ok(())
@@ -185,29 +185,29 @@ impl Universe {
         self.to_string()
     }
 
-    fn clear_grid( &mut self) -> () {
+    fn clear_grid( &mut self) {
         for i in 0..self.cells.len()  {
             self.cells[i] = Cell::Dead;
         }
     }
 
-    pub fn make_spaceship(&mut self) -> () {
+    pub fn make_spaceship(&mut self)  {
         // let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
         self.clear_grid();
         Universe::set_cells(self, &SPACESHIP);
     }
-    pub fn make_rpentamino(&mut self) -> () {
+    pub fn make_rpentamino(&mut self)  {
         // let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
         // self.clear_grid();
         Universe::set_cells(self, &RPENTOMINO);
     }
-    pub fn make_piheptomino(&mut self) -> () {
+    pub fn make_piheptomino(&mut self) {
         // let targets = [ (0,0), (1,0), (2,0), (3,0), (0,1), (4,1), (0,2), (1,3), (4,3)];
         self.clear_grid();
         Universe::set_cells(self, &PIHEPTOMINO);
     }
 
-    pub fn make_glider(&mut self) -> () {
+    pub fn make_glider(&mut self)  {
         self.clear_grid();
         Universe::set_cells(self, &GLIDER);
     }
