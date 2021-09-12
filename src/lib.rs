@@ -42,12 +42,6 @@ macro_rules! console_log {
 }
 
 #[wasm_bindgen]
-pub fn greet(name: &str) {
-    alert("Hello, wasm-game-of-life!");
-    alert(&format!("Hello, {}!", name));
-}
-
-#[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Cell {
@@ -172,7 +166,7 @@ impl Universe {
                 }
             })
             .collect();
-        console_log!("Creating a {} x {} Life Universe", width, height);
+       
 
         Universe {
             width,
