@@ -62,6 +62,7 @@ pub struct Universe {
     width: u32,
     height: u32,
     cells: Vec<Cell>,
+    generations: u32,
 }
 
 
@@ -126,9 +127,11 @@ impl Universe {
 
                 next[idx] = next_cell;
             }
+    
         }
 
         self.cells = next;
+        self.generations = self.generations + 1;
     }
 
     // ...
@@ -156,6 +159,7 @@ impl Universe {
     pub fn new(w: u32, h: u32) -> Universe {
         let width = w;
         let height = h;
+        let generations: u32 = 0;
 
         let cells = (0..width * height)
             .map(|_i| {
@@ -172,6 +176,7 @@ impl Universe {
             width,
             height,
             cells,
+            generations,
         }     
     }
     
@@ -224,6 +229,11 @@ impl Universe {
         // console_log!("Reference to {} x {} Life Universe ", self.width, self.height);
         self.cells.as_ptr()
     }
+
+     pub fn generations(&self) -> u32 {
+        self.generations
+    }
+
      // ...
 
     /// Set the width of the universe.
